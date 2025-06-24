@@ -1,3 +1,9 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { UserPlus, LogIn, Mail, Lock, User } from "lucide-react";
+
+import { API_BASE_URL } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -7,20 +13,20 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { useState } from "react";
-import { API_BASE_URL } from "@/lib/api";
-import { useNavigate } from "react-router-dom";
-import { UserPlus, LogIn, Mail, Lock, User } from "lucide-react";
-import { toast } from "sonner";
 
 const Register = () => {
   const [FirstName, setFirstName] = useState("");
   const [LastName, setLastName] = useState("");
   const [Email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const navigate = useNavigate();
 
   const handleRegister = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     try {
       const res = await fetch(`${API_BASE_URL}/users/register`, {
         method: "POST",
@@ -38,7 +44,9 @@ const Register = () => {
       navigate("/");
     } catch (err) {
       console.error(err);
-      toast.error(`${err}`);
+      toast.error(`${err}` || "Registration failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -127,6 +135,7 @@ const Register = () => {
             <Button
               type="submit"
               className="flex items-center justify-center gap-2"
+              disabled={isSubmitting}
             >
               <UserPlus className="h-4 w-4" />
               Register
@@ -136,6 +145,7 @@ const Register = () => {
               variant="outline"
               onClick={() => navigate("/")}
               className="flex items-center justify-center gap-2"
+              disabled={isSubmitting}
             >
               <LogIn className="h-4 w-4" />
               Log In

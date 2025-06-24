@@ -1,29 +1,39 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { LogIn, UserPlus, Mail, Lock } from "lucide-react";
+
+import { API_BASE_URL } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { useState, useEffect } from "react";
-import { API_BASE_URL } from "@/lib/api";
-import { useNavigate } from "react-router-dom";
-import { LogIn, UserPlus, Mail, Lock } from "lucide-react";
-import { toast } from "sonner";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 const Login = () => {
   const [Email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const handlePageLoad = () => {
+  useEffect(() => {
     const auth = localStorage.getItem("auth");
-
     if (auth) {
       const userData = JSON.parse(auth);
       if (userData && userData._id) {
         navigate("/changelog");
       }
     }
-  };
+  }, []);
 
   const handleLogin = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     try {
       const res = await fetch(`${API_BASE_URL}/users/login`, {
         method: "POST",
@@ -35,20 +45,17 @@ const Login = () => {
       if (!res.ok) throw new Error("Login failed");
 
       const data = await res.json();
-      const userData = data.user;
-      localStorage.setItem("auth", JSON.stringify(userData));
+      localStorage.setItem("auth", JSON.stringify(data.user));
       localStorage.setItem("sidebar-collapsed", "false");
 
       navigate("/changelog");
     } catch (err) {
       console.error(err);
       toast.error("Login failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    handlePageLoad();
-  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted px-4">
@@ -102,6 +109,7 @@ const Login = () => {
             <Button
               type="submit"
               className="flex items-center justify-center gap-2"
+              disabled={isSubmitting}
             >
               <LogIn className="h-4 w-4" />
               Log In
@@ -111,6 +119,7 @@ const Login = () => {
               variant="outline"
               onClick={() => navigate("/register")}
               className="flex items-center justify-center gap-2"
+              disabled={isSubmitting}
             >
               <UserPlus className="h-4 w-4" />
               Register

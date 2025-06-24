@@ -14,13 +14,12 @@ export const AppSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [loggedInName, setLoggedInName] = useState("");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handlePageLoad = async () => {
     const auth = localStorage.getItem("auth");
 
-    if (!auth) {
-      return;
-    }
+    if (!auth) return;
 
     const { FirstName, LastName } = JSON.parse(auth);
     setLoggedInName(`${FirstName} ${LastName}`);
@@ -38,6 +37,9 @@ export const AppSidebar = () => {
   };
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+
     try {
       const res = await fetch(`${API_BASE_URL}/users/logout`, {
         method: "POST",
@@ -45,7 +47,7 @@ export const AppSidebar = () => {
         credentials: "include",
       });
 
-      if (!res.ok) throw new Error("Login failed");
+      if (!res.ok) throw new Error("Logout failed");
 
       localStorage.removeItem("auth");
       localStorage.removeItem("sidebar-collapsed");
@@ -53,6 +55,8 @@ export const AppSidebar = () => {
     } catch (err) {
       console.error(err);
       toast.error("Logout failed. Please try again.");
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -106,6 +110,7 @@ export const AppSidebar = () => {
 
         <button
           onClick={handleLogout}
+          disabled={isLoggingOut}
           className={cn(
             "w-full flex items-center justify-center gap-2 text-sm font-medium rounded-md",
             "bg-destructive text-primary-foreground hover:bg-destructive/90",
