@@ -30,7 +30,6 @@ const ChangeLog = () => {
       const data = await res.json();
       setChangeLog(data);
     } catch (err) {
-      console.error(err);
       toast.error("Failed to fetch change log.");
     } finally {
       setLoading(false);

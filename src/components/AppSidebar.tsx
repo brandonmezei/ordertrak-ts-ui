@@ -53,7 +53,6 @@ export const AppSidebar = () => {
       localStorage.removeItem("sidebar-collapsed");
       navigate("/");
     } catch (err) {
-      console.error(err);
       toast.error("Logout failed. Please try again.");
     } finally {
       setIsLoggingOut(false);

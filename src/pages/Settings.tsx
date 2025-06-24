@@ -31,7 +31,6 @@ const Settings = () => {
       setLastName(data.LastName || "");
       setEmail(data.Email || "");
     } catch (err) {
-      console.error(err);
       toast.error("Failed to fetch settings.");
     } finally {
       setLoading(false);

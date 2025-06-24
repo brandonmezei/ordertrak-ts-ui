@@ -50,7 +50,6 @@ const Login = () => {
 
       navigate("/changelog");
     } catch (err) {
-      console.error(err);
       toast.error("Login failed");
     } finally {
       setIsSubmitting(false);

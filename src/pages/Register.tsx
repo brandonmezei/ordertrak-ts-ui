@@ -43,7 +43,6 @@ const Register = () => {
 
       navigate("/");
     } catch (err) {
-      console.error(err);
       toast.error(`${err}` || "Registration failed");
     } finally {
       setIsSubmitting(false);
