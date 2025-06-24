@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
+import { LogIn, UserPlus, Mail, Lock } from "lucide-react";
+import { toast } from "sonner";
 
 const Login = () => {
   const [Email, setEmail] = useState("");
@@ -40,7 +42,7 @@ const Login = () => {
       navigate("/changelog");
     } catch (err) {
       console.error(err);
-      alert("Login failed");
+      toast.error("Login failed");
     }
   };
 
@@ -50,49 +52,72 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted px-4">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl">Login</CardTitle>
-          <div className="text-center text-muted-foreground mt-2 text-lg font-semibold">
-            Welcome to OrderTrak!
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleLogin();
-            }}
-            autoComplete="on"
-            className="space-y-4"
-          >
-            <Input
-              type="email"
-              placeholder="Email"
-              autoComplete="email"
-              value={Email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              autoComplete="current-password"
-              value={Password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <div className="grid grid-cols-2 gap-2">
-              <Button type="submit">Log In</Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/register")}
-              >
-                Register
-              </Button>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleLogin();
+        }}
+        className="w-full max-w-md"
+        autoComplete="on"
+      >
+        <Card className="shadow-lg">
+          <CardHeader className="border-b border-border">
+            <CardTitle className="text-center text-2xl">Login</CardTitle>
+            <div className="text-center text-muted-foreground mt-2 text-lg font-semibold">
+              Welcome to OrderTrak!
             </div>
-          </form>
-        </CardContent>
-      </Card>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                <Mail className="h-4 w-4" />
+              </span>
+              <Input
+                type="email"
+                placeholder="Email"
+                autoComplete="email"
+                value={Email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                <Lock className="h-4 w-4" />
+              </span>
+              <Input
+                type="password"
+                placeholder="Password"
+                autoComplete="current-password"
+                value={Password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </CardContent>
+
+          <CardFooter className="grid grid-cols-2 gap-2 border-t border-border">
+            <Button
+              type="submit"
+              className="flex items-center justify-center gap-2"
+            >
+              <LogIn className="h-4 w-4" />
+              Log In
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate("/register")}
+              className="flex items-center justify-center gap-2"
+            >
+              <UserPlus className="h-4 w-4" />
+              Register
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
     </div>
   );
 };

@@ -8,6 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LoaderPinwheel } from "lucide-react";
+import { toast } from "sonner";
 
 const ChangeLog = () => {
   const [changeLog, setChangeLog] = useState<any[]>([]);
@@ -29,7 +31,7 @@ const ChangeLog = () => {
       setChangeLog(data);
     } catch (err) {
       console.error(err);
-      alert("Failed to fetch change log.");
+      toast.error("Failed to fetch change log.");
     } finally {
       setLoading(false);
     }
@@ -48,7 +50,9 @@ const ChangeLog = () => {
       </p>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex justify-center items-center">
+          <LoaderPinwheel className="h-32 w-32 animate-spin text-primary" />
+        </div>
       ) : (
         <div className="space-y-6">
           {changeLog.length > 0 ? (

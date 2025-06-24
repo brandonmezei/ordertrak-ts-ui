@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { API_BASE_URL } from "@/lib/api";
+import { toast } from "sonner";
 
 const navItems = [
   { name: "Change Log", path: "/changelog", icon: FileClock },
@@ -51,7 +52,7 @@ export const AppSidebar = () => {
       navigate("/");
     } catch (err) {
       console.error(err);
-      alert("Logout failed. Please try again.");
+      toast.error("Logout failed. Please try again.");
     }
   };
 
