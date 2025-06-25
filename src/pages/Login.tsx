@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { LogIn, UserPlus, Mail, Lock } from "lucide-react";
@@ -19,16 +19,6 @@ const Login = () => {
   const [Password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const auth = localStorage.getItem("auth");
-    if (auth) {
-      const userData = JSON.parse(auth);
-      if (userData && userData._id) {
-        navigate("/changelog");
-      }
-    }
-  }, []);
 
   const handleLogin = async () => {
     if (isSubmitting) return;

@@ -2,8 +2,16 @@ import { useEffect, useState } from "react";
 import { API_BASE_URL } from "@/lib/api";
 import { LoaderPinwheel, Mail, Lock, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { toast } from "sonner";
+import { Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Settings = () => {
   const [loading, setLoading] = useState(true);
@@ -13,6 +21,7 @@ const Settings = () => {
   const [CurrentPassword, setCurrentPassword] = useState("");
   const [NewPassword, setNewPassword] = useState("");
   const [ConfirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePageLoad = async () => {
     try {
@@ -27,13 +36,46 @@ const Settings = () => {
       if (!res.ok) throw new Error("Failed to fetch settings.");
 
       const data = await res.json();
-      setFirstName(data.FirstName || "");
-      setLastName(data.LastName || "");
-      setEmail(data.Email || "");
+      const user = data.user;
+      
+      setFirstName(user.FirstName || "");
+      setLastName(user.LastName || "");
+      setEmail(user.Email || "");
     } catch (err) {
       toast.error("Failed to fetch settings.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleProfileUpdate = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          FirstName,
+          LastName,
+          Email,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update profile.");
+
+      const data = await res.json();
+      localStorage.setItem("auth", JSON.stringify(data.user));
+
+      toast.success("Profile updated successfully.");
+    } catch (err) {
+      toast.error(`${err}` || "Failed to update profile.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -105,6 +147,16 @@ const Settings = () => {
                 </div>
               </form>
             </CardContent>
+            <CardFooter className="flex justify-center border-t border-border">
+              <Button
+                className="w-48 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                disabled={isSubmitting}
+                onClick={handleProfileUpdate}
+              >
+                <Save className="h-4 w-4" />
+                Save
+              </Button>
+            </CardFooter>
           </Card>
 
           {/* Password Reset Card */}

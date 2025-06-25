@@ -1,11 +1,11 @@
-import { Routes, Route } from "react-router-dom"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import ChangeLog from "./pages/ChangeLog"
-import Settings from "./pages/Settings"
-import Layout from "@/components/layout"
-import { ThemeProvider } from "@/components/theme-provider"
-import { ProtectedRoute } from "@/components/ProtectedRoute"
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ChangeLog from "./pages/ChangeLog";
+import Settings from "./pages/Settings";
+import Layout from "@/components/layout";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Toaster } from "sonner";
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
         </Route>
       </Routes>
     </ThemeProvider>
-  )
+  );
 }
 
-export default App
+export default App;
