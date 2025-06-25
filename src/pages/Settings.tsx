@@ -37,7 +37,7 @@ const Settings = () => {
 
       const data = await res.json();
       const user = data.user;
-      
+
       setFirstName(user.FirstName || "");
       setLastName(user.LastName || "");
       setEmail(user.Email || "");
@@ -66,7 +66,11 @@ const Settings = () => {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to update profile.");
+      if (!res.ok) {
+        const errorData = await res.json();
+        const errorMsg = errorData.error || "Profile update failed.";
+        throw new Error(errorMsg);
+      }
 
       const data = await res.json();
       localStorage.setItem("auth", JSON.stringify(data.user));
@@ -74,6 +78,46 @@ const Settings = () => {
       toast.success("Profile updated successfully.");
     } catch (err) {
       toast.error(`${err}` || "Failed to update profile.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    setIsSubmitting(true);
+
+    if (NewPassword !== ConfirmPassword) {
+      toast.error("New passwords do not match.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          CurrentPassword,
+          NewPassword,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        const errorMsg = errorData.error || "Password change failed.";
+        throw new Error(errorMsg);
+      }
+
+      toast.success("Password changed successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      toast.error(`${err}` || "Failed to change password.");
     } finally {
       setIsSubmitting(false);
     }
@@ -97,18 +141,21 @@ const Settings = () => {
       ) : (
         <div className="flex flex-col lg:flex-row lg:items-start gap-6">
           {/* Profile Info Card */}
-          <Card className="w-full lg:w-1/2 shadow-lg">
-            <CardHeader className="border-b border-border">
-              <CardTitle className="text-center text-2xl">
-                User Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-4">
-              <form
-                onSubmit={(e) => e.preventDefault()}
-                autoComplete="off"
-                className="space-y-4"
-              >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleProfileUpdate();
+            }}
+            autoComplete="off"
+            className="w-full lg:w-1/2"
+          >
+            <Card className="shadow-lg">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="text-center text-2xl">
+                  User Settings
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-4">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                     <User className="h-4 w-4" />
@@ -145,33 +192,36 @@ const Settings = () => {
                     className="pl-10"
                   />
                 </div>
-              </form>
-            </CardContent>
-            <CardFooter className="flex justify-center border-t border-border">
-              <Button
-                className="w-48 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
-                disabled={isSubmitting}
-                onClick={handleProfileUpdate}
-              >
-                <Save className="h-4 w-4" />
-                Save
-              </Button>
-            </CardFooter>
-          </Card>
+              </CardContent>
+              <CardFooter className="flex justify-center border-t border-border">
+                <Button
+                  className="w-48 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                  disabled={isSubmitting}
+                  type="submit"
+                >
+                  <Save className="h-4 w-4" />
+                  Save
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
 
           {/* Password Reset Card */}
-          <Card className="w-full lg:w-1/2 shadow-lg">
-            <CardHeader className="border-b border-border">
-              <CardTitle className="text-center text-2xl">
-                Change Password
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-4">
-              <form
-                onSubmit={(e) => e.preventDefault()}
-                autoComplete="off"
-                className="space-y-4"
-              >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handlePasswordChange();
+            }}
+            autoComplete="off"
+            className="w-full lg:w-1/2"
+          >
+            <Card className="shadow-lg">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="text-center text-2xl">
+                  Change Password
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-4">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                     <Lock className="h-4 w-4" />
@@ -214,9 +264,19 @@ const Settings = () => {
                   <li>Contains at least one uppercase letter (A-Z)</li>
                   <li>Contains at least one number (0-9)</li>
                 </ul>
-              </form>
-            </CardContent>
-          </Card>
+              </CardContent>
+              <CardFooter className="flex justify-center border-t border-border">
+                <Button
+                  className="w-48 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={isSubmitting}
+                  type="submit"
+                >
+                  <Save className="h-4 w-4" />
+                  Change Password
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
         </div>
       )}
     </div>
