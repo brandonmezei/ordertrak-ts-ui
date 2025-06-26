@@ -6,6 +6,8 @@ import {
   Users,
   BadgePlus,
   Shield,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -19,23 +21,14 @@ export const AppSidebar = () => {
   const [loggedInName, setLoggedInName] = useState("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handlePageLoad = async () => {
-    const auth = localStorage.getItem("auth");
-
-    if (!auth) return;
-
-    const { FirstName, LastName } = JSON.parse(auth);
-    setLoggedInName(`${FirstName} ${LastName}`);
-  };
-
   const [collapsed, setCollapsed] = useState(() => {
     const saved = localStorage.getItem("sidebar-collapsed");
     return saved === "true";
   });
 
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(() => {
-    const saved = localStorage.getItem("sidebar-collapsed");
-    return saved === "true";
+  const [managementOpen, setManagementOpen] = useState(() => {
+    const saved = localStorage.getItem("management-open");
+    return saved !== "false";
   });
 
   const toggleCollapse = () => {
@@ -44,11 +37,12 @@ export const AppSidebar = () => {
     localStorage.setItem("sidebar-collapsed", String(next));
   };
 
-  const toggleMobileCollapse = () => {
-    const next = !mobileSidebarOpen;
-    setMobileSidebarOpen(next);
-    setCollapsed(false);
-    localStorage.setItem("sidebar-collapsed", String(next));
+  const toggleManagement = () => {
+    setManagementOpen((prev) => {
+      const next = !prev;
+      localStorage.setItem("management-open", String(next));
+      return next;
+    });
   };
 
   const handleLogout = async () => {
@@ -74,6 +68,13 @@ export const AppSidebar = () => {
     }
   };
 
+  const handlePageLoad = async () => {
+    const auth = localStorage.getItem("auth");
+    if (!auth) return;
+    const { FirstName, LastName } = JSON.parse(auth);
+    setLoggedInName(`${FirstName} ${LastName}`);
+  };
+
   useEffect(() => {
     handlePageLoad();
   }, []);
@@ -87,14 +88,8 @@ export const AppSidebar = () => {
             <span className="text-lg font-semibold">OrderTrak</span>
           )}
           <button
-            className="p-1 hover:bg-muted rounded hidden md:inline-flex"
+            className="p-1 hover:bg-muted rounded inline-flex"
             onClick={toggleCollapse}
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <button
-            className="p-1 hover:bg-muted rounded md:hidden"
-            onClick={toggleMobileCollapse}
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -111,56 +106,77 @@ export const AppSidebar = () => {
             )}
           >
             <FileClock className="h-4 w-4" />
-            {!collapsed && <span>Change Log</span>}
+            <span>Change Log</span>
           </Link>
+
           <div className="border-t border-border mt-4" />
+
           <div className="mt-4">
-            {!collapsed && (
-              <div className="px-4 text-xs text-muted-foreground mb-1 uppercase tracking-wide">
-                Management
+            <button
+              onClick={toggleManagement}
+              className={cn(
+                "flex items-center w-full gap-3 px-4 py-2 text-sm rounded-md transition-colors",
+                "hover:bg-muted"
+              )}
+            >
+              <BadgePlus className="h-4 w-4" />
+              {!collapsed && (
+                <>
+                  <span className="flex-1 text-left">Management</span>
+                  {managementOpen ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </>
+              )}
+            </button>
+
+            {managementOpen && (
+              <div className="mt-1 flex flex-col gap-1 pl-8">
+                <Link
+                  to="/customer"
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-2 text-sm rounded-md transition-colors",
+                    "hover:bg-muted",
+                    location.pathname === "/customer" &&
+                      "bg-muted font-semibold"
+                  )}
+                >
+                  <BadgePlus className="h-4 w-4" />
+                  <span>Customer</span>
+                </Link>
+                <Link
+                  to="/role"
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-2 text-sm rounded-md transition-colors",
+                    "hover:bg-muted",
+                    location.pathname === "/role" && "bg-muted font-semibold"
+                  )}
+                >
+                  <Shield className="h-4 w-4" />
+                  <span>Role</span>
+                </Link>
+                <Link
+                  to="/user"
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-2 text-sm rounded-md transition-colors",
+                    "hover:bg-muted",
+                    location.pathname === "/user" && "bg-muted font-semibold"
+                  )}
+                >
+                  <Users className="h-4 w-4" />
+                  <span>User</span>
+                </Link>
               </div>
             )}
-            <div className="flex flex-col gap-1">
-              <Link
-                to="/customer"
-                className={cn(
-                  "flex items-center gap-3 px-4 py-2 text-sm rounded-md transition-colors",
-                  "hover:bg-muted",
-                  location.pathname === "/customer" && "bg-muted font-semibold"
-                )}
-              >
-                <BadgePlus className="h-4 w-4" />
-                {!collapsed && <span>Customer</span>}
-              </Link>
-              <Link
-                to="/role"
-                className={cn(
-                  "flex items-center gap-3 px-4 py-2 text-sm rounded-md transition-colors",
-                  "hover:bg-muted",
-                  location.pathname === "/role" && "bg-muted font-semibold"
-                )}
-              >
-                <Shield className="h-4 w-4" />
-                {!collapsed && <span>Role</span>}
-              </Link>
-              <Link
-                to="/user"
-                className={cn(
-                  "flex items-center gap-3 px-4 py-2 text-sm rounded-md transition-colors",
-                  "hover:bg-muted",
-                  location.pathname === "/user" && "bg-muted font-semibold"
-                )}
-              >
-                <Users className="h-4 w-4" />
-                {!collapsed && <span>User</span>}
-              </Link>
-            </div>
           </div>
         </nav>
       </div>
 
-      <div className="mt-auto px-4 py-4 space-y-2">
-        {!collapsed && loggedInName && (
+      {/* Footer */}
+      <div className="sticky bottom-0 px-4 py-4 space-y-2 bg-background border-t border-border">
+        {loggedInName && (
           <div className="text-sm text-muted-foreground truncate">
             Logged in as <span className="font-medium">{loggedInName}</span>
           </div>
@@ -176,7 +192,7 @@ export const AppSidebar = () => {
           title="User Settings"
         >
           <Settings className="h-4 w-4" />
-          {!collapsed && <span>Settings</span>}
+          <span>Settings</span>
         </Link>
 
         <button
@@ -190,44 +206,31 @@ export const AppSidebar = () => {
           title="Log Out"
         >
           <LogOut className="h-4 w-4" />
-          {!collapsed && <span>Log Out</span>}
+          <span>Log Out</span>
         </button>
       </div>
     </>
   );
 
   return (
-    <>
-      <button
-        onClick={toggleMobileCollapse}
-        className="md:hidden p-2 m-2 rounded hover:bg-muted"
-        aria-label="Open sidebar"
-      >
-        <Menu />
-      </button>
-
-      {mobileSidebarOpen && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
-            onClick={toggleMobileCollapse}
-          />
-          <aside className="fixed left-0 top-0 z-50 w-64 h-full bg-background border-r border-border flex flex-col md:hidden">
-            {sidebarContent}
-          </aside>
-        </>
+    <aside
+      className={cn(
+        "flex flex-col h-screen overflow-hidden transition-all duration-200 ease-in-out border-r",
+        collapsed ? "w-16 items-center" : "w-64",
+        "bg-background text-foreground border-border"
       )}
-
-      {/* Desktop sidebar */}
-      <aside
-        className={cn(
-          "hidden md:flex flex-col h-screen overflow-hidden transition-all duration-200 ease-in-out border-r",
-          collapsed ? "w-16" : "w-64",
-          "bg-background text-foreground border-border"
-        )}
-      >
-        {sidebarContent}
-      </aside>
-    </>
+    >
+      {collapsed ? (
+        <button
+          onClick={toggleCollapse}
+          className="p-3 mt-4 rounded hover:bg-muted"
+          aria-label="Expand sidebar"
+        >
+          <span className="text-xl font-bold">OT</span>
+        </button>
+      ) : (
+        sidebarContent
+      )}
+    </aside>
   );
 };

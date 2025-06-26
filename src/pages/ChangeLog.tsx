@@ -60,7 +60,7 @@ const ChangeLog = () => {
                 key={entry._id || idx}
                 className="border border-border shadow"
               >
-                <CardHeader>
+                <CardHeader className="border-b border-border">
                   <CardTitle className="text-lg">
                     Rollout Date:{" "}
                     {entry.RollOutDate

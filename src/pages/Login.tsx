@@ -37,6 +37,7 @@ const Login = () => {
       const data = await res.json();
       localStorage.setItem("auth", JSON.stringify(data.user));
       localStorage.setItem("sidebar-collapsed", "false");
+      localStorage.setItem("management-open", "false");
 
       navigate("/changelog");
     } catch (err) {
@@ -53,7 +54,7 @@ const Login = () => {
           e.preventDefault();
           handleLogin();
         }}
-        className="w-full max-w-md"
+        className="w-full max-w-sm"
         autoComplete="on"
       >
         <Card className="shadow-lg">
